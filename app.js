@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 require('./db/conn.js');
+const cookieParser = require("cookie-parser");
 
 const Products = require("./models/productsSchema.js");
 
@@ -12,6 +13,7 @@ const router = require("./routes/router.js");
 
 
 app.use(express.json());
+app.use(cookieParser(""));
 app.use(cors());
 app.use(router);
 
