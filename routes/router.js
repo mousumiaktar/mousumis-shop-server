@@ -91,9 +91,9 @@ router.post("/login", async (req, res) => {
             const token = await userlogin.generateAuthtoken();
             // console.log(token);
 
-            res.cookie("restaurant",token,{
-                expires:new Date(Date.now() + 900000),
-                httpOnly:true
+            res.cookie("restaurant", token, {
+                expires: new Date(Date.now() + 900000),
+                httpOnly: true
             })
 
 
@@ -114,33 +114,33 @@ router.post("/login", async (req, res) => {
 
 // adding the data into cart
 
-router.post("/addcart/:id",authenticate, async(req, res)=>{
+router.post("/addcart/:id", authenticate, async (req, res) => {
     try {
-        const {id} = req.params;
-        const cart = await Products.findOne({id:id});
+        const { id } = req.params;
+        const cart = await Products.findOne({ id: id });
         console.log(cart + "cart value");
 
-        const UserContact = await USER.findOne({_id:req.userID});
+        const UserContact = await USER.findOne({ _id: req.userID });
         console.log(UserContact);
 
-        if(UserContact){
+        if (UserContact) {
             const cartData = await UserContact.addcartdata(cart);
             await UserContact.save();
             console.log(cartData);
             res.status(201).json(UserContact);
-        }else{
-            res.status(401).json({error:"invalid user"});
+        } else {
+            res.status(401).json({ error: "invalid user" });
         }
-        
+
     } catch (error) {
-        res.status(401).json({error:"invalid user"});
+        res.status(401).json({ error: "invalid user" });
     }
 });
 
 // GET CART DETAILS
-router.get("/cartdetails",authenticate,async(req, res)=>{
+router.get("/cartdetails", authenticate, async (req, res) => {
     try {
-        const buyuser = await USER.findOne({_id:req.userID});
+        const buyuser = await USER.findOne({ _id: req.userID });
         res.status(201).json(buyuser);
     } catch (error) {
         console.log("error" + error);
@@ -149,14 +149,54 @@ router.get("/cartdetails",authenticate,async(req, res)=>{
 
 
 // GET VALID USER
-router.get("/validuser",authenticate,async(req, res)=>{
+router.get("/validuser", authenticate, async (req, res) => {
     try {
-        const validuserone = await USER.findOne({_id:req.userID});
+        const validuserone = await USER.findOne({ _id: req.userID });
         res.status(201).json(validuserone);
     } catch (error) {
         console.log("error" + error);
     }
 });
+
+
+// DELETE ITEM FROM CART
+router.delete("/remove/:id", authenticate, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        req.rootUser.carts = req.rootUser.carts.filter((currentValue) => {
+            return currentValue.id != id;
+        });
+
+        req.rootUser.save();
+        res.status(201).json(req.rootUser);
+        console.log("item removed");
+
+    } catch (error) {
+        console.log("error" + error);
+        res.status(400).json(req.rootUser);
+    }
+});
+
+
+// USER LOGOUT...
+router.get("/logout",authenticate,(req,res)=>{
+    try {
+        req.rootUser.tokens = req.rootUser.tokens.filter((currentElement)=>{
+            return currentElement.token !== req.token
+        });
+
+        res.clearCookie("restaurant",{path:"/"});
+
+        req.rootUser.save();
+        res.status(201).json(req.rootUser.tokens);
+        console.log("user logout");
+    } catch (error) {
+       console.log("error for user logout");
+    }
+})
+
+
 
 
 
