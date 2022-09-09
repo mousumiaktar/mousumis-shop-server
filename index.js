@@ -19,6 +19,14 @@ app.use(router);
 
 
 const port = 5000;
+app.get('/', (req, res)=>{
+    res.send("home page");
+
+})
+app.all('*', (req, res)=>{
+    res.send("no route found");
+
+})
 
 app.listen(port,()=>{
     console.log(`server is running on port number ${port}`);
