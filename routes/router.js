@@ -87,7 +87,14 @@ router.post("/login", async (req, res) => {
             const isMatch = await bcrypt.compare(password, userlogin.password);
             // console.log(isMatch);
 
-            // jwt Token.........
+           
+
+
+            if (!isMatch) {
+                res.status(400).json({ error: "invalid password" });
+            } else {
+
+                 // jwt Token.........
             const token = await userlogin.generateAuthtoken();
             // console.log(token);
 
@@ -96,10 +103,6 @@ router.post("/login", async (req, res) => {
                 httpOnly: true
             })
 
-
-            if (!isMatch) {
-                res.status(400).json({ error: "invalid password" });
-            } else {
                 res.status(201).json(userlogin);
             }
         } else {
