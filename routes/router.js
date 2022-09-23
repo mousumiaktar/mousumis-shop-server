@@ -1,7 +1,7 @@
 const express = require("express");
 const router = new express.Router();
 const Products = require("../models/productsSchema.js");
-const USER = require("../models/userSchema.js");
+const User = require("../models/userSchema.js");
 const bcrypt = require("bcryptjs");
 const authenticate = require("../middleware/authenticate.js");
 
@@ -45,19 +45,19 @@ router.post("/register", async (req, res) => {
     };
 
     try {
-        const preuser = await USER.findOne({ email: email });
+        const preuser = await User.findOne({ email: email });
 
         if (preuser) {
             res.status(422).json({ error: "this user is already exist" })
         } else if (password !== cpassword) {
             res.status(422).json({ error: "password and confirm password are not match" })
         } else {
-            const finalUser = new USER({
+            const finalUser = new User({
                 fname, email, mobile, password, cpassword
             });
 
             const storedata = await finalUser.save();
-            console.log(storedata);
+            // console.log(storedata);
 
             res.status(201).json(storedata);
         }
@@ -80,7 +80,7 @@ router.post("/login", async (req, res) => {
     };
 
     try {
-        const userlogin = await USER.findOne({ email: email });
+        const userlogin = await User.findOne({ email: email });
         console.log(userlogin + "user value");
 
         if (userlogin) {
@@ -99,7 +99,7 @@ router.post("/login", async (req, res) => {
             // console.log(token);
 
             res.cookie("restaurant", token, {
-                expires: new Date(Date.now() + 900000),
+                expires: new Date(Date.now() + 2589000),
                 httpOnly: true
             })
 
@@ -120,10 +120,10 @@ router.post("/login", async (req, res) => {
 router.post("/addcart/:id", authenticate, async (req, res) => {
     try {
         const { id } = req.params;
-        const cart = await Products.findOne({ id: id });
+        const cart = await Products.findOne({ id:id });
         console.log(cart + "cart value");
 
-        const UserContact = await USER.findOne({ _id: req.userID });
+        const UserContact = await User.findOne({ _id:req.userID });
         console.log(UserContact);
 
         if (UserContact) {
@@ -141,9 +141,9 @@ router.post("/addcart/:id", authenticate, async (req, res) => {
 });
 
 // GET CART DETAILS
-router.get("/cartdetails", authenticate, async (req, res) => {
+router.get("/cartdetails",  authenticate, async (req, res) => {
     try {
-        const buyuser = await USER.findOne({ _id: req.userID });
+        const buyuser = await User.findOne({ _id: req.userID });
         res.status(201).json(buyuser);
     } catch (error) {
         console.log("error" + error);
@@ -154,7 +154,7 @@ router.get("/cartdetails", authenticate, async (req, res) => {
 // GET VALID USER
 router.get("/validuser", authenticate, async (req, res) => {
     try {
-        const validuserone = await USER.findOne({ _id: req.userID });
+        const validuserone = await User.findOne({ _id: req.userID });
         res.status(201).json(validuserone);
     } catch (error) {
         console.log("error" + error);
@@ -168,7 +168,7 @@ router.delete("/remove/:id", authenticate, async (req, res) => {
         const { id } = req.params;
 
         req.rootUser.carts = req.rootUser.carts.filter((currentValue) => {
-            return currentValue.id != id;
+            return currentValue.id !== id;
         });
 
         req.rootUser.save();

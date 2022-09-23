@@ -12,10 +12,22 @@ const cors = require("cors");
 const router = require("./routes/router.js");
 
 
+
 app.use(express.json());
 app.use(cookieParser(""));
-app.use(cors());
 app.use(router);
+app.use(cors({
+    origin: "http://localhost:3000",
+}));
+
+
+
+// const corsConfig = {
+//     origin: true,
+//     credentials: true,
+//   };
+//   app.use(cors(corsConfig));
+//   app.options("*", cors(corsConfig));
 
 
 const port = process.env.PORT||5000;

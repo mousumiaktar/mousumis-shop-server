@@ -1,16 +1,17 @@
 const jwt = require("jsonwebtoken");
-const USER = require("../models/userSchema.js");
+const User = require("../models/userSchema.js");
 const secretKey = process.env.KEY;
 
 const authenticate = async(req, res, next) =>{
+    
     try {
         const token = req.cookies.restaurant;
 
         const verifyToken = jwt.verify(token, secretKey);
-        console.log(verifyToken);
+        // console.log(verifyToken);
 
-        const rootUser = await USER.findOne({_id:verifyToken._id,"tokens.token":token});
-        console.log(rootUser);
+        const rootUser = await User.findOne({_id:verifyToken._id,"tokens.token":token});
+        // console.log(rootUser);
 
         if(!rootUser){
             throw new Error("user not found");
